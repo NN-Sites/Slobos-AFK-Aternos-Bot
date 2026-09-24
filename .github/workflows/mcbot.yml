@@ -1,0 +1,32 @@
+name: Minecraft Bot Runner
+
+on:
+  schedule:
+    # מפעיל את ה-Workflow אוטומטית כל 5 שעות
+    - cron: '0 */5 * * *'
+  workflow_dispatch: # מאפשר להפעיל את הבוט ידנית מתי שבא לך
+
+# מונע כפילויות – מנתק את הבוט הישן ברגע שמתחילה הרצה חדשה
+concurrency:
+  group: minecraft-bot-group
+  cancel-in-progress: true
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Minecraft Bot
+        # יריץ את הקובץ הראשי שלך למשך 4.5 שעות ויעצור בבטחה
+        run: timeout 4.5h node index.js || true
